@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F2891D">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="description" content="Automação de envio de documentos REURB">
+  <title>AS Geomensor - Envio de E-mail</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css?v=15.0.0">
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer onload="window.__gisLoaded=true; window.dispatchEvent(new Event('gis-loaded'));" onerror="window.__gisError=true;"></script>
+  <!-- Google API JavaScript client -->
+  <script src="https://apis.google.com/js/api.js" defer onload="window.__gapiLoaded=true; window.dispatchEvent(new Event('gapi-loaded'));" onerror="window.__gapiError=true;"></script>
+  <!-- SheetJS para leitura do XLSX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">
+  	<img src="icon-192.png" alt="Logo">
+      </div>
+      <div>
+        <h1>AGIBEL SANTOS - TÉCNICO GEOMENSOR</h1>
+        <div class="subtitle">Envio de documentos · V16</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <span id="connection-status" class="status-dot offline" title="Desconectado"></span>
+      <button class="icon-btn" id="btn-settings" title="Configurações" aria-label="Configurações">⚙</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- CONFIGURAÇÃO -->
+    <section class="screen" id="screen-setup">
+      <div class="card">
+        <div class="section-title">Configuração inicial</div>
+
+        <div class="info-box">
+          <strong>Google Drive:</strong><br>
+          A.S_AGRIMENSOR → 1.LEVANTAMENTOS_TOPOGRAFICOS
+        </div>
+
+        <label for="input-dest-email">E-mail fixo da prefeitura</label>
+        <input type="email" id="input-dest-email" placeholder="destinatario@exemplo.com" autocomplete="email">
+        <div class="field-hint">Usado somente para os processos do tipo REURB. O e-mail do cliente vem da planilha.</div>
+
+        <button class="primary full" id="btn-save-setup">Salvar e continuar</button>
+
+        <div class="small-note">
+          O aplicativo usa sua conta Google para consultar os processos no Drive.
+          Nenhum arquivo é baixado para o celular pelo aplicativo.
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section class="screen" id="screen-login">
+      <div class="center-stage">
+        <div class="mark-big">
+  	   <img src="icon-192.png" alt="Logo">
+	</div>
+        <h2>Acessar o Google Drive</h2>
+        <p>Entre com a conta Google que possui acesso à pasta A.S_AGRIMENSOR.</p>
+        <button class="primary" id="btn-login">Entrar com Google</button>
+        <button class="ghost" id="btn-open-settings-from-login">Configurações</button>
+        <div id="login-error" class="error-box hidden"></div>
+      </div>
+    </section>
+
+    <!-- LISTA -->
+    <section class="screen" id="screen-list">
+      <div class="list-header">
+        <div>
+          <h2>Processos</h2>
+          <div id="folder-breadcrumb" class="muted"></div>
+        </div>
+        <div class="list-controls">
+          <label class="limit-label" for="process-limit">Mostrar</label>
+          <select id="process-limit" class="limit-select" title="Quantidade de processos a carregar">
+            <option value="10" selected>10 processos</option>
+            <option value="20">20 processos</option>
+            <option value="30">30 processos</option>
+            <option value="50">50 processos</option>
+            <option value="100">100 processos</option>
+          </select>
+          <button class="ghost small" id="btn-refresh">↻ Atualizar</button>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <span>⌕</span>
+        <input type="search" id="input-search" placeholder="Buscar processo ou cliente..." autocomplete="off">
+      </div>
+
+      <div id="list-banner"></div>
+      <div id="list-container"></div>
+    </section>
+
+    <!-- DETALHE -->
+    <section class="screen" id="screen-detail">
+      <button class="back-link" id="btn-back-to-list">← Voltar</button>
+      <div id="detail-container"></div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="app.js?v=16.0.0"></script>
+</body>
+</html>

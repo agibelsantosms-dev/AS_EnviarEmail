@@ -1,0 +1,16 @@
+CONFIGURAÇÕES USADAS NESTA VERSÃO
+
+Google Cloud Project:
+(Seu projeto)
+
+Client ID:
+298689728813-n1pa123cvd9gub3ui63trnom57hm5amg.apps.googleusercontent.com
+
+Pasta raiz A.S_AGRIMENSOR:
+1-I_fkHUYOCUaY_J4TS2TV3q1SBSeFAgu
+
+Subpasta:
+1.LEVANTAMENTOS_TOPOGRÁFICOS
+
+Arquivo de dados em cada processo:
+Cliente_Serviço Consulta.xlsx
