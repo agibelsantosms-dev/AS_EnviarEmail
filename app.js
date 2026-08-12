@@ -764,10 +764,7 @@ async function prepareEmailByType(item, type, destination, documentsDefinition) 
 
   if (!documents.length) { showToast("Nenhum documento foi encontrado para este envio."); return; }
 
-  const gmailWindow = window.open("about:blank", "_blank");
-  if (!gmailWindow) { showToast("O navegador bloqueou a abertura do Gmail. Permita pop-ups para este site e tente novamente."); return; }
-
-  const setProgress = (text) => {
+   const setProgress = (text) => {
     try {
       gmailWindow.document.title = "Envio de documentos";
       gmailWindow.document.body.innerHTML = `<div style="font-family:Arial,sans-serif;padding:30px"><h2>Envio de documentos</h2><p>${escapeHtml(text)}</p></div>`;
@@ -805,11 +802,35 @@ async function prepareEmailByType(item, type, destination, documentsDefinition) 
 
     // Abrimos o Gmail por URL de composição, como nas versões anteriores.
     // Não criamos rascunho pela API e não anexamos imagem.
-    const gmailUrl = "https://mail.google.com/mail/?view=cm&fs=1" +
-      `&to=${encodeURIComponent(destination)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    // const gmailUrl = "https://mail.google.com/mail/?view=cm&fs=1" +
+    //   `&to=${encodeURIComponent(destination)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    // setProgress("Abrindo o Gmail com o e-mail pronto...");
+    // gmailWindow.location.href = gmailUrl;
 
-    setProgress("Abrindo o Gmail com o e-mail pronto...");
-    gmailWindow.location.href = gmailUrl;
+     const isAndroid = /Android/i.test(navigator.userAgent);
+
+     setProgress("Abrindo o e-mail com os dados preenchidos...");
+      
+      if (isAndroid) {
+        // No Android, usa mailto para entregar a composição
+        // ao aplicativo de e-mail (Gmail).
+        const mailtoUrl =
+          `mailto:${encodeURIComponent(destination)}` +
+          `?subject=${encodeURIComponent(subject)}` +
+          `&body=${encodeURIComponent(bodyText)}`;
+      
+        window.location.href = mailtoUrl;
+      
+      } else {
+        // No computador, mantém o Gmail Web como já funciona.
+        const gmailUrl =
+          "https://mail.google.com/mail/?view=cm&fs=1" +
+          `&to=${encodeURIComponent(destination)}` +
+          `&su=${encodeURIComponent(subject)}` +
+          `&body=${encodeURIComponent(bodyText)}`;
+      
+        window.open(gmailUrl, "_blank");
+      }
 
     markProcessSent(processo, type);
     renderProcessList();
@@ -821,7 +842,7 @@ async function prepareEmailByType(item, type, destination, documentsDefinition) 
       : `<div class="success-box">Gmail aberto. ${sharedDocuments.length} documento(s) foram compartilhados individualmente para ${type === "cliente" ? "o cliente" : "a prefeitura"}.</div>`;
   } catch (err) {
     console.error(err);
-    try { gmailWindow.close(); } catch (_) {}
+    // try { gmailWindow.close(); } catch (_) {}
     const message = $("detail-message");
     if (message) message.innerHTML = `<div class="error-box">Não foi possível preparar o e-mail.<br><br>${escapeHtml(err.message || "Erro desconhecido")}</div>`;
   }
