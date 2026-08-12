@@ -83,11 +83,12 @@ const $ = (id) => document.getElementById(id);
 
 document.addEventListener("DOMContentLoaded", () => {
   bindEvents();
-  // Service Worker desativado durante o desenvolvimento para evitar cache antigo.
-  // Será reativado quando a versão PWA estiver estável.
+
+  // Carrega configurações salvas
   loadSavedSettings();
+
+  // Carrega status dos processos já enviados
   loadSentProcesses();
-  showScreen("setup");
 
   // O Google Identity Services carrega de forma assíncrona.
   waitForGoogle();
@@ -121,6 +122,55 @@ function loadSavedSettings() {
   }
 }
 
+// -------
+async function restoreGoogleSession() {
+  const savedToken = localStorage.getItem(CONFIG.TOKEN_KEY);
+
+  // Não existe token salvo.
+  if (!savedToken) {
+    showScreen("setup");
+    return;
+  }
+
+  try {
+    accessToken = savedToken;
+
+    if (!driveReady || !tokenClient) {
+      await initGoogleClient();
+    }
+
+    gapi.client.setToken({
+      access_token: accessToken
+    });
+
+    // Testa o token fazendo uma chamada simples ao Drive.
+    await gapi.client.drive.files.list({
+      pageSize: 1,
+      fields: "files(id)"
+    });
+
+    // Token válido
+    setOnline(true);
+
+    showScreen("list");
+    loadProcesses();
+
+  } catch (err) {
+    console.warn("Token salvo inválido ou expirado:", err);
+
+    // Remove somente a sessão inválida.
+    localStorage.removeItem(CONFIG.TOKEN_KEY);
+
+    accessToken = null;
+
+    setOnline(false);
+
+    // Volta para a configuração inicial.
+    showScreen("setup");
+  }
+}
+// -------
+
 function saveSetup() {
   const email = $("input-dest-email").value.trim();
 
@@ -147,14 +197,21 @@ function waitForGoogle() {
 
   const attempt = async () => {
     if (window.google?.accounts?.oauth2 && window.gapi) {
-      googleReady = true;
-      try {
-        await initGoogleClient();
-        return;
-      } catch (err) {
-        console.error("Falha ao inicializar Google:", err);
-      }
-    }
+     googleReady = true;
+   
+     try {
+       await initGoogleClient();
+   
+       // Depois que o Google estiver pronto,
+       // tenta restaurar a sessão anterior.
+       await restoreGoogleSession();
+   
+       return;
+   
+     } catch (err) {
+       console.error("Falha ao inicializar Google:", err);
+     }
+   }
 
     if (Date.now() - started < 60000) {
       setTimeout(attempt, 250);
