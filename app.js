@@ -75,7 +75,7 @@ async function prepareWhatsAppClient(item) {
     })
     .join("\n\n");
 
-  const text = `Olá ${nome}! Seguem os links dos arquivos digitais referentes ao levantamento topográfico do imóvel localizado na ${endereco}:\n\n${documentLinksText}\n\nAtenciosamente,\nAgibel Santos — Técnico Geomensor`;
+  const text = `Olá, ${nome}! Seguem os links dos arquivos digitais referentes ao levantamento topográfico do imóvel localizado na ${endereco}:\n\n${documentLinksText}\n\nAtenciosamente,\nAgibel Santos — Técnico Geomensor`;
 
   // Dispara o WhatsApp (funciona no celular abrindo o app direto e no PC abrindo o WhatsApp Web)
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
