@@ -41,6 +41,48 @@ let currentProcess = null;
 // um processo REURB possa ter, por exemplo, Cliente enviado e Prefeitura pendente.
 const sentState = { cliente: {}, prefeitura: {} };
 
+async function prepareWhatsAppClient(item) {
+  const d = item.data || {};
+  let phone = d.celular || d.telefone || "";
+  
+  // Limpa caracteres não numéricos (deixa só números)
+  phone = phone.replace(/\D/g, "");
+
+  if (!phone || phone.length < 10) {
+    showToast("O campo CELULAR da planilha não contém um número válido.");
+    return;
+  }
+
+  // Garante o DDI do Brasil (55) caso o número venha sem ele
+  if (!phone.startsWith("55") && phone.length <= 11) {
+    phone = "55" + phone;
+  }
+
+  const nome = d.pessoa_nome || "Cliente";
+  const endereco = d.imovel_endereco_completo || "imóvel";
+  const documents = getClientDocumentEntries(item).filter(x => x.file);
+
+  if (!documents.length) { 
+    showToast("Nenhum documento foi encontrado para este envio."); 
+    return; 
+  }
+
+  const documentLinksText = documents
+    .map(({emailLabel, file}) => {
+      const url = file.webViewLink || driveViewLink(file.id);
+      return `• ${emailLabel}:\n${url}`;
+    })
+    .join("\n\n");
+
+  const text = `Olá ${nome}! Seguem os links dos arquivos digitais referentes ao levantamento topográfico do imóvel localizado na ${endereco}:\n\n${documentLinksText}\n\nAtenciosamente,\nAgibel Santos — Técnico Geomensor`;
+
+  // Dispara o WhatsApp (funciona no celular abrindo o app direto e no PC abrindo o WhatsApp Web)
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+  window.open(whatsappUrl, "_blank");
+
+  showToast("WhatsApp aberto com a mensagem pronta!");
+}
+
 function loadSentProcesses() {
   for (const type of ["cliente", "prefeitura"]) {
     const key = type === "cliente" ? CONFIG.SENT_CLIENT_KEY : CONFIG.SENT_PREFEITURA_KEY;
@@ -754,10 +796,11 @@ function renderProcessDetail(item) {
         <div class="small-note" style="margin-top:0;padding-top:0;border-top:0">
           Inclui dados brutos da estação total, declaração técnico-proprietário e os demais documentos do levantamento.
         </div>
-        <div class="actions">
-          <button class="primary" id="btn-compose-client">👤 Enviar e-mail para cliente</button>
+        <div class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="primary" id="btn-compose-client" style="flex: 1;">👤 Enviar e-mail para cliente</button>
+          <button class="primary" id="btn-whatsapp-client" style="flex: 1; background-color: #25D366; color: white;">📱 Enviar WhatsApp</button>
         </div>
-        <div class="small-note">Status: ${isProcessSent(itemProcessNumber(item), "cliente") ? "✓ Cliente já enviado" : "Pendente"}</div>
+        <div class="small-note">Status do E-mail: ${isProcessSent(itemProcessNumber(item), "cliente") ? "✓ Já enviado" : "Pendente"}</div>
       </div>
 
       <div class="detail-card wide">
@@ -780,11 +823,14 @@ function renderProcessDetail(item) {
         </div>
         <div class="small-note">Cada documento possui seu próprio link no Google Drive. A pasta do processo não é compartilhada.</div>
         <div id="detail-message"></div>
-      </div>
+      </div>      
     </div>`;
 
   $("btn-compose-client").addEventListener("click", () => {
     prepareClientEmail(item);
+  });
+  $("btn-whatsapp-client").addEventListener("click", () => {
+    prepareWhatsAppClient(item);
   });
   $("btn-compose-prefeitura").addEventListener("click", () => {
     if (isReurb(item)) preparePrefeituraEmail(item);
@@ -1077,6 +1123,7 @@ async function readXlsxFromDrive(fileId) {
       "endereco completo imovel", "endereco"
     ]),
     email: getField(normalized, ["email", "e mail", "email cliente", "e mail cliente"]),
+    celular: getField(normalized, ["celular", "telefone", "fone", "whatsapp", "cel"]), // <-- ADICIONE ESTA LINHA
     tipo_servico: getField(normalized, ["tipo_servico", "tipo servico", "servico", "tipo de servico"])
   };
 }
