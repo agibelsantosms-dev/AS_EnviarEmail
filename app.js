@@ -43,7 +43,8 @@ const sentState = { cliente: {}, prefeitura: {} };
 
 async function prepareWhatsAppClient(item) {
   const d = item.data || {};
-  let phone = d.celular || d.telefone || "";
+  // Pega o valor e converte obrigatoriamente para string antes de limpar
+  let phone = String(d.celular || d.telefone || "").trim();
   
   // Limpa caracteres não numéricos (deixa só números)
   phone = phone.replace(/\D/g, "");
