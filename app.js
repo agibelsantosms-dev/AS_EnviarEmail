@@ -898,9 +898,15 @@ async function prepareEmailByType(item, type, destination, documentsDefinition) 
   })
   .join("\n\n");
 
+   // Verifica se o arquivo TRFU complementar foi encontrado
+  const hasTrfu = !!item.structure?.trfu;
+  
+  // Define o trecho adicional caso o comprovante exista
+  const complementoTrfu = hasTrfu ? ", inclusive comprovante de pagamento referente à taxa de regularização fundiária urbana (TRFU)," : "";
+     
     const introText = type === "cliente"
       ? `${saudacao}!\n\nSegue abaixo os links para os arquivos digitais referentes ao levantamento topográfico do imóvel localizado na ${endereco}, de posse de ${nome}, CPF n° ${cpf}.\n\nPara acessar os arquivos digitais, utilize os links individuais abaixo:\n\n`
-      : `${saudacao}!\n\nSegue abaixo os links para os arquivos digitais do procedimento referente ao imóvel localizado na ${endereco}, de posse de ${nome}, CPF n° ${cpf}.\n\nPara acessar os arquivos digitais, utilize os links individuais abaixo:\n\n`;
+      : `${saudacao}!\n\nSegue abaixo os links para os arquivos digitais ${complementoTrfu} do procedimento referente ao imóvel localizado na ${endereco}, de posse de ${nome}, CPF n° ${cpf}.\n\nPara acessar os arquivos digitais, utilize os links individuais abaixo:\n\n`;
 
     const bodyText = `${introText}${documentLinksText}\n\nAtenciosamente,\n\nAgibel Santos\nTécnico Geomensor`;
 
