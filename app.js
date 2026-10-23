@@ -906,7 +906,7 @@ async function prepareEmailByType(item, type, destination, documentsDefinition) 
      
     const introText = type === "cliente"
       ? `${saudacao}!\n\nSegue abaixo os links para os arquivos digitais referentes ao levantamento topográfico do imóvel localizado na ${endereco}, de posse de ${nome}, CPF n° ${cpf}.\n\nPara acessar os arquivos digitais, utilize os links individuais abaixo:\n\n`
-      : `${saudacao}!\n\nSegue abaixo os links para os arquivos digitais ${complementoTrfu} do procedimento referente ao imóvel localizado na ${endereco}, de posse de ${nome}, CPF n° ${cpf}.\n\nPara acessar os arquivos digitais, utilize os links individuais abaixo:\n\n`;
+      : `${saudacao}!\n\nSegue abaixo os links para os arquivos digitais${complementoTrfu} do procedimento referente ao imóvel localizado na ${endereco}, de posse de ${nome}, CPF n° ${cpf}.\n\nPara acessar os arquivos digitais, utilize os links individuais abaixo:\n\n`;
 
     const bodyText = `${introText}${documentLinksText}\n\nAtenciosamente,\n\nAgibel Santos\nTécnico Geomensor`;
 
