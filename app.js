@@ -790,9 +790,9 @@ function renderProcessDetail(item) {
         <div class="detail-label">Tipo de serviço</div>
         <div class="detail-value"><strong>${escapeHtml(tipoServico || "Não informado")}</strong></div>
         <div class="detail-label" style="margin-top:14px">E-mail do cliente</div>
-        <div class="detail-value">${escapeHtml(clientEmail || "Não informado")}</div>
+        <div class="detail-value"><strong>${escapeHtml(clientEmail || "Não informado")}</strong></div>
         <div class="detail-label" style="margin-top:14px">WhatsApp</div>
-        <div class="detail-value">${escapeHtml(clientCelular || "Não informado")}</div>
+        <div class="detail-value"><strong>${escapeHtml(formatPhoneNumber(clientCelular) || "Não informado")}</strong></div>
       </div>
 
       <div class="detail-card wide">
@@ -1235,4 +1235,21 @@ function registerServiceWorker() {
         .catch(err => console.warn("Service Worker:", err));
     });
   }
+}
+
+function formatPhoneNumber(phone) {
+  const cleaned = String(phone || "").replace(/\D/g, "");
+  
+  // Se tiver 11 dígitos (Celular com DDD: XX 9XXXX-XXXX)
+  if (cleaned.length === 11) {
+    return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
+  }
+  
+  // Se tiver 10 dígitos (Fixo com DDD: XX XXXX-XXXX)
+  if (cleaned.length === 10) {
+    return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 6)}-${cleaned.substring(6)}`;
+  }
+  
+  // Se não encaixar nos padrões, retorna o número original ou limpo
+  return phone;
 }
