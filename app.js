@@ -75,7 +75,7 @@ async function prepareWhatsAppClient(item) {
     })
     .join("\n\n");
 
-  const text = `${saudacao}, ${nome}! Seguem os links dos arquivos digitais referentes ao levantamento topográfico do imóvel localizado na ${endereco}:\n\n${documentLinksText}\n\nAtenciosamente,\nAgibel Santos — Técnico Geomensor`;
+  const text = `${saudacao} ${nome}! Seguem os links dos arquivos digitais referentes ao levantamento topográfico do imóvel localizado na ${endereco}:\n\n${documentLinksText}\n\nAtenciosamente,\nAgibel Santos — Técnico Geomensor`;
 
   // Dispara o WhatsApp (funciona no celular abrindo o app direto e no PC abrindo o WhatsApp Web)
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
@@ -737,6 +737,7 @@ function renderProcessDetail(item) {
   const missingCount = documents.length - foundCount;
   const tipoServico = item.data?.tipo_servico || "";
   const clientEmail = item.data?.email || "";
+  const clientCelular = item.data?.celular || item.data?.telefone || "";
 
   $("detail-container").innerHTML = `
     <div class="detail-grid">
@@ -790,8 +791,8 @@ function renderProcessDetail(item) {
         <div class="detail-value"><strong>${escapeHtml(tipoServico || "Não informado")}</strong></div>
         <div class="detail-label" style="margin-top:14px">E-mail do cliente</div>
         <div class="detail-value">${escapeHtml(clientEmail || "Não informado")}</div>
-        <div class="detail-label" style="margin-top:14px">Celular / WhatsApp</div>
-        <div class="detail-value">${escapeHtml(d.celular || d.telefone || "Não informado")}</div>
+        <div class="detail-label" style="margin-top:14px">WhatsApp</div>
+        <div class="detail-value">${escapeHtml(clientCelular || "Não informado")}</div>
       </div>
 
       <div class="detail-card wide">
