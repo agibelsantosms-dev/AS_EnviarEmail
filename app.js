@@ -325,7 +325,7 @@ async function loginGoogle() {
       throw new Error("O Google ainda não está pronto.");
     }
 
-    tokenClient.requestAccessToken({ prompt: "consent" });
+    tokenClient.requestAccessToken({});
 
   } catch (err) {
     console.error(err);
